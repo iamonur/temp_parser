@@ -405,6 +405,7 @@ def generate_all():
 
 
 def generate_compile_spin():
+	os.system("mkdir spin")
 	os.system("rm spin/temp.pml")
 
 	f = open("spin/temp.pml", "a")

@@ -6,6 +6,7 @@ BasicGame
     SpriteSet
         hedef > Immovable color=GREEN
         dusman > Immovable color=RED
+        #dusman > AStarChaser color=RED
         oyuncu > MovingAvatar
             avatar > alternate_keys=True
             #dusman > color=BLUE
