@@ -6,6 +6,7 @@ output_file = "tempfile.txt"
 
 def get_trail_out(executable, trail):
     system_command = "{} -r -S {} > {}".format(executable, trail, output_file)
+
     os.system(system_command)
 
 def parse_trail_out():
@@ -54,6 +55,10 @@ def print_playback(moves):
         print("{} - {}".format(move[0], move[1]))
 
 def parse_moves(moves):
+
+    if moves[-1][0] is "LOSE":
+        return None, None
+
     avatar = []
     opponent = []
     if len(moves) == 0:
@@ -75,13 +80,13 @@ def change_to_actions(avatar, opponent):
         if m_av is "Skip":
             av.append(None)
         if m_av is "D":
-            av.append(3)
-        if m_av is "S":
             av.append(2)
+        if m_av is "S":
+            av.append(3)
         if m_av is "A":
-            av.append(1)
-        if m_av is "W":
             av.append(0)
+        if m_av is "W":
+            av.append(1)
 
     # TODO: Opponent cannot be moved yet, thus no point filling it.
 

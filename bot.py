@@ -37,14 +37,22 @@ def bot_play():
     former.generate_compile_spin()
     maze = former.mazify()
 
+    nicer_parser.get_trail_out("./temp.out", "temp.pml.trail")
     a, b = nicer_parser.parse_moves(nicer_parser.parse_trail_out())
+
+    if a is None:
+        print("Couldn't find any.")
+        return
+
+    print(maze)
+
     avatar_actions, opponent_actions = nicer_parser.change_to_actions(a, b)
 
     g = VGDLParser().parseGame(basic_maze)
     g.buildLevel(maze)
 
-    env = GameEnvironment(g, visualize=True, actionDelay=100)
-    env.rollOut(actions)
+    env = GameEnvironment(g, visualize=True, actionDelay=1000)
+    env.rollOut(avatar_actions)
 
 if __name__ == "__main__":
     bot_play()

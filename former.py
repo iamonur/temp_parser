@@ -412,8 +412,8 @@ def generate_compile_spin():
 	f.close()
 
 	os.system("spin -a spin/temp.pml")
-	os.system("gcc -DREACH pan.c -o temp.out")
-	os.system("./temp.out -a -i -m10000")
+	os.system("gcc pan.c -DREACH -o temp.out")
+	os.system("./temp.out -a -i -m3000")
 
 def generate_only_spin():
 	return generate_all()
