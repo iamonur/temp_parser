@@ -1,3 +1,6 @@
+import nicer_parser
+import former
+
 basic_maze = """
 BasicGame
     SpriteSet
@@ -21,28 +24,27 @@ BasicGame
         G > hedef
 """
 
-maze= """
-wwwwwwww
-wA     w
-w     Gw
-w   E  w
-w      w
-w      w
-w      w
-wwwwwwww
-"""
+#FIXME:
+#py-vgdl do not let us to have two moving characters in bot re-play. Thus, I need
+#to move the project to python 3.6 to have py-vgdl 2.0. However, I need to be sure
+#of that it supports that kind of replay first.
 
-actions = [3, 3, 3, 3, 3, 2, 0, 2, 0, 0, 0]
-
-if __name__ == "__main__":
+def bot_play():
     import pygame
-    #from ontology import DARKGRAY, BASEDIRS, LIGHTGRAY, RED, LIGHTBLUE
     from vgdl.interfaces import GameEnvironment
     from vgdl.core import VGDLParser
+
+    former.generate_compile_spin()
+    maze = former.mazify()
+
+    a, b = nicer_parser.parse_moves(nicer_parser.parse_trail_out())
+    avatar_actions, opponent_actions = nicer_parser.change_to_actions(a, b)
+
     g = VGDLParser().parseGame(basic_maze)
     g.buildLevel(maze)
 
-    #VGDLParser.playGame(basic_maze, maze)
     env = GameEnvironment(g, visualize=True, actionDelay=100)
     env.rollOut(actions)
-    #env.reset()
+
+if __name__ == "__main__":
+    bot_play()

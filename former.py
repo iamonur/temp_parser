@@ -1,6 +1,8 @@
 import random # to generate inside walls with a probability.
 import os
 
+list_sprites = []
+
 promela_whole_file = """
 {}
 {}
@@ -356,25 +358,31 @@ init{{
 #7- Opponent, Y coordinate
 
 def generate_walls():
-    walls = []
+	walls = []
+	flag = False
+	wall_string = """{}"""
 
-    wall_string = """{}"""
+	for i in range (1,7):
+		for ii in range (1,7):
+			if(random.random() >= 0.8):
+				for a in list_sprites:
+					if a[1] == i and a[2] == ii:
+						flag = True
+				if flag is False:
+					walls.append([i,ii])
+				flag = False
 
-    for i in range(1,7):
-        for ii in range(1,7):
-            if(random.random() >= 0.8):
-                walls.append([i,ii])
+	for wall in walls:
+		list_sprites.append(["Wall", wall[0], wall[1]])
+		wall_string = wall_string.format("\tmap[{}].a[{}] = 1; \n{}".format(wall[0], wall[1], "{}"))
+		if walls.index(wall) == (len(walls)-1):
+			wall_string = wall_string.format("")
 
-    for wall in walls:
-        wall_string = wall_string.format("\tmap[{}].a[{}] = 1; \n{}".format(wall[0], wall[1], "{}"))
-        if walls.index(wall) == (len(walls)-1):
-            wall_string = wall_string.format("")
-
-    return wall_string
+	return wall_string
 
 def generate_portal_avatar_opponent():
 
-    portal = [random.randint(1,7), random.randint(1,7)]
+    portal = [random.randint(1,6), random.randint(1,6)]
     avatar = [random.randint(1,6), random.randint(1,6)]
     opponent = [random.randint(1,6), random.randint(1,6)]
 
@@ -384,23 +392,65 @@ def generate_portal_avatar_opponent():
     return portal[0], portal[1], avatar[0], avatar[1], opponent[0], opponent[1]
 
 def generate_all():
-    li = generate_portal_avatar_opponent()
-    print(li)
-    formatted_init = promela_init.format(generate_walls(), li[0], li[1], li[2], li[3], li[4], li[5])
-    return promela_whole_file.format(promela_comment_01, promela_comment_02, promela_header, promela_avatar_process, promela_opponent_process, formatted_init, promela_ltl_formula)
+	li = generate_portal_avatar_opponent()
+	temp_p = ["Portal", li[0], li[1]]
+	list_sprites.append(temp_p)
+	temp_a = ["Avatar", li[2], li[3]]
+	list_sprites.append(temp_a)
+	temp_o = ["Opponent", li[4], li[5]]
+	list_sprites.append(temp_o)
 
-def former_main_functionality():
+	formatted_init = promela_init.format(generate_walls(), li[0], li[1], li[2], li[3], li[4], li[5])
+	return promela_whole_file.format(promela_comment_01, promela_comment_02, promela_header, promela_avatar_process, promela_opponent_process, formatted_init, promela_ltl_formula)
 
-    os.system("rm spin/temp.pml")
 
-    f = open("spin/temp.pml", "a")
-    f.write(generate_all())
-    f.close()
+def generate_compile_spin():
+	os.system("rm spin/temp.pml")
 
-    os.system("spin -a spin/temp.pml")
-    os.system("gcc -DREACH pan.c")
-    os.system("./a.out -a -i -m1000000")
+	f = open("spin/temp.pml", "a")
+	f.write(generate_all())
+	f.close()
 
+	os.system("spin -a spin/temp.pml")
+	os.system("gcc -DREACH pan.c -o temp.out")
+	os.system("./temp.out -a -i -m10000")
+
+def generate_only_spin():
+	return generate_all()
+
+def mazify():
+
+	arr = [list("      "), list("      "), list("      "), list("      "), list("      "), list("      ")]
+
+
+
+	print(list_sprites)
+
+	for elem in list_sprites:
+		if elem[0] is "Portal":
+			arr[elem[1]-1][elem[2]-1] = "G"
+		elif elem[0] is "Avatar":
+			arr[elem[1]-1][elem[2]-1] = "A"
+		elif elem[0] is "Opponent":
+			arr[elem[1]-1][elem[2]-1] = "E"
+		elif elem[0] is "Wall":
+			arr[elem[1]-1][elem[2]-1] = "w"
+
+
+	maze_str = ""
+	maze_str += "wwwwwwww\n"
+	for line in arr:
+		maze_str += "w"
+
+		for a in line:
+			maze_str += a
+
+		maze_str += "w"
+		maze_str += "\n"
+	maze_str += "wwwwwwww"
+
+	return maze_str
 
 if __name__ == "__main__":
-    former_main_functionality()
+	print(generate_only_spin())
+	print(mazify())
